@@ -33,7 +33,6 @@ void free_table();
 int main(int argc, char const *argv[]) {
     srand(time(NULL));
     setlocale(LC_CTYPE, "");
-    
 
     D1 = atoi(argv[1]);
     D2 = atoi(argv[2]);
