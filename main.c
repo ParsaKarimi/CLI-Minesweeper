@@ -25,6 +25,7 @@ void print_table();
 struct input translate_action(char action, char cell);
 bool is_bomb(BYTE x, BYTE y);
 void update_table(struct input input);
+void free_table();
 
 int main(int argc, char const *argv[]) {
     srand(time(NULL));
@@ -34,8 +35,9 @@ int main(int argc, char const *argv[]) {
     if (D1 < 10 || D2 < 10) {
         return 1;
     }
-    
+
     generate_table();
+    free_table();
 
     return 0;
 }
@@ -144,4 +146,12 @@ void update_table(struct input input) {
 
 void free_table() {
     // TODO: clear tables from memory
+
+    for (BYTE i = 0; i < D1; i++) {
+        free(table[i]);
+        free(userTable[i]);
+    }
+    free(table);
+    free(userTable);
+
 }
