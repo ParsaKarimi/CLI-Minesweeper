@@ -39,3 +39,7 @@ bool is_bomb(BYTE x, BYTE y) {
 void update_table(struct input input) {
     // TODO: update table values based on user input
 }
+
+void free_table() {
+    // TODO: clear tables from memory
+}
