@@ -8,7 +8,6 @@
 #include <ctype.h>
 
 #define BOMB_CHANCE .12
-#define UNVISITED 0x25A1
 
 typedef uint8_t BYTE;
 
@@ -43,8 +42,8 @@ int main(int argc, char const *argv[]) {
     srand(time(NULL));
     setlocale(LC_CTYPE, "");
 
-    D1 = atoi(argv[1]);
-    D2 = atoi(argv[2]);
+    D1 = atoi(argv[2]);
+    D2 = atoi(argv[1]);
     if (D1 < 10 || D2 < 10) {
         return 1;
     }
