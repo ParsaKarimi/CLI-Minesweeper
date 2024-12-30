@@ -5,6 +5,7 @@
 #include <time.h>
 #include <wchar.h>
 #include <locale.h>
+#include <ctype.h>
 
 #define BOMB_CHANCE .10
 #define UNVISITED 0x25A1
@@ -18,24 +19,22 @@ int nBomb;
 int nFounedBomb;
 bool playing = true;
 
-struct input {
+struct {
     BYTE x;
     BYTE y;
     BYTE action;
-};
+} input;
 
 void generate_table();
 void print_table();
-struct input translate_action(char action, char cell);
+void translate_action(char action, char *cell);
 bool is_bomb(BYTE x, BYTE y);
-void update_table(struct input input);
+void update_table();
 void free_table();
 
 int main(int argc, char const *argv[]) {
     srand(time(NULL));
     setlocale(LC_CTYPE, "");
-
-    printf("press enter to start!");
 
     D1 = atoi(argv[1]);
     D2 = atoi(argv[2]);
@@ -46,11 +45,19 @@ int main(int argc, char const *argv[]) {
     generate_table();
     while (playing) {
         print_table();
-        char userAction;
-        char cell[4];
-        scanf_s(" %1c", &userAction, 1);
-        scanf_s(" %2c", &cell[0], 2);
-        scanf_s(" %2c", &cell[2], 2);
+        char userAction[2];
+        char cell[6];
+        
+        scanf(" %1s", &userAction, 1);
+        if (toupper(userAction[0]) == 'E') break;
+
+        scanf(" %2s", &cell[0], 2);
+        scanf(" %2s", &cell[3], 2);
+        
+        translate_action(userAction[0], cell);
+
+        if (input.action == 0b00) continue;
+
         break;
     }
     free_table();
@@ -172,7 +179,6 @@ char choose_table_letter(BYTE value) {
 }
 
 void print_table() {
-    // TODO: print table and number of bombs remaind
 
     // system("cls");
 
@@ -198,15 +204,36 @@ void print_table() {
 
 }
 
-struct input translate_action(char action, char cell) {
+void translate_action(char action, char *cell) {
     // TODO: convert text values into usable structure
+
+    input.action = 0;
+
+    for (BYTE i = 0; i < 6; i++) 
+        if ((cell[i] < '0' || cell[i] > '9') && (tolower(cell[i]) < 'a' || tolower(cell[i]) > 'f') && cell[i] != 0) return;
+
+    input.x = strtol(&cell[0], NULL, 16);
+    input.y = strtol(&cell[3], NULL, 16);
+
+    switch (toupper(action)) {
+        case 'C':
+            input.action = 0b10;
+            break;
+        case 'F':
+            input.action = 0b11;
+            break;
+        default:
+            input.action = 0b00;
+            break;
+    }
+
 }
 
 bool is_bomb(BYTE x, BYTE y) {
     // TODO: check if user clicked on a bomb
 }
 
-void update_table(struct input input) {
+void update_table() {
     // TODO: update table values based on user input
 }
 
