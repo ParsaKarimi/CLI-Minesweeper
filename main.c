@@ -31,7 +31,6 @@ void translate_action(char action, char *cell);
 bool is_bomb();
 void handle_click();
 void handle_flag();
-void update_table();
 void free_table();
 
 int main(int argc, char const *argv[]) {
@@ -66,6 +65,7 @@ int main(int argc, char const *argv[]) {
             print_table();
             break;
         }
+        if (input.action == 0b11) handle_flag();
 
     }
     free_table();
@@ -202,7 +202,7 @@ void print_table() {
         printf("\n│");
         for (BYTE j = 0; j < D2; j++) {
             if (playing) {
-                printf(" %c │", choose_table_letter(userTable[i][j]));
+                printf(" %c │", choose_user_table_letter(userTable[i][j]));
             } else {
                 printf(" %c │", choose_table_letter(table[i][j]));
             }
@@ -265,11 +265,10 @@ void handle_click() {
 }
 
 void handle_flag() {
-    // TODO: add or remove flag from a cell
-}
+    
+    userTable[input.y][input.x] = userTable[input.y][input.x] == 0x80 ? 0:0x80;
+    nFounedBomb += userTable[input.y][input.x] == 0x80 ? 1:-1;
 
-void update_table() {
-    // TODO: update table values based on user input
 }
 
 void free_table() {
