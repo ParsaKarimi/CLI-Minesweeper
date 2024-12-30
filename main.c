@@ -80,6 +80,12 @@ int main(int argc, char const *argv[]) {
         if (input.action == 0b11) handle_flag();
         handle_click();
 
+        if (is_game_finished()) {
+            printf("Congrats, you are alive, but not for long!\n");
+            break;
+        }
+        
+
     }
     free_table();
 
@@ -364,14 +370,25 @@ void handle_click() {
 
 void handle_flag() {
     
-    if(userTable[input.y][input.x] != 0x80 || userTable[input.y][input.x] != 0) return;
+    if (userTable[input.y][input.x] != 0x80 && userTable[input.y][input.x] != 0) return;
     userTable[input.y][input.x] = userTable[input.y][input.x] == 0x80 ? 0:0x80;
     nFounedBomb += userTable[input.y][input.x] == 0x80 ? 1:-1;
 
 }
 
 bool is_game_finished() {
-    // TODO: check if all bombs are founded
+
+    if (nBomb != nFounedBomb) return false;
+    
+    for (BYTE i = 0; i < D1; i++) {
+        for (BYTE j = 0; j < D2; j++) {
+            if (userTable[i][j] == 0) return false;
+            if (userTable[i][j] == 0x80 && userTable[i][j] != table[i][j]) return false;
+        }
+    }
+
+    return true;
+
 }
 
 void free_table() {
