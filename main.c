@@ -52,18 +52,20 @@ int main(int argc, char const *argv[]) {
     generate_table();
     while (playing) {
 
+        for (BYTE i = 0; i < 255; i++) printf("\n");
+
         print_table();
         char userAction[2];
         char cell[6];
         
         scanf(" %1s", &userAction, 1);
         if (toupper(userAction[0]) == 'E') break;
-        if (toupper(userAction[0]) == 'T') {
-            playing = false;
-            print_table();
-            playing = true;
-            continue;
-        }
+        // if (toupper(userAction[0]) == 'T') {
+        //     playing = false;
+        //     print_table();
+        //     playing = true;
+        //     continue;
+        // }
 
         scanf(" %2s", &cell[0], 2);
         scanf(" %2s", &cell[3], 2);
@@ -78,13 +80,12 @@ int main(int argc, char const *argv[]) {
             break;
         }
         if (input.action == 0b11) handle_flag();
-        handle_click();
+        else handle_click();
 
         if (is_game_finished()) {
             printf("Congrats, you are alive, but not for long!\n");
             break;
         }
-        
 
     }
     free_table();
@@ -107,73 +108,88 @@ void generate_table() {
         for (BYTE j = 0; j < D2; j++)
             table[i][j] = ((double)rand() / (double)RAND_MAX) > (1. - BOMB_CHANCE) ? 0b10000000:0b00000000;
 
-    for (BYTE i = 0; i < D1; i++) {
-        for (BYTE j = 0; j < D2; j++) {
-            if (table[i][j] == 0x80) {
-                nBomb++;
+    // Count number of bombs on center
+    for (BYTE i = 1; i < D1-1; i++) {
+        for (BYTE j = 1; j < D2-1; j++) {
 
-                if (i > 0 && j > 0 && i < D1-1 && j < D2-1) {
-                    table[i-1][j-1] += table[i-1][j-1] != 0x80;
-                    table[i-1][j]   += table[i-1][j]   != 0x80;
-                    table[i-1][j+1] += table[i-1][j+1] != 0x80;
-                    table[i][j-1]   += table[i][j-1]   != 0x80;
-                    table[i][j+1]   += table[i][j+1]   != 0x80;
-                    table[i+1][j-1] += table[i+1][j-1] != 0x80;
-                    table[i+1][j]   += table[i+1][j]   != 0x80;
-                    table[i+1][j+1] += table[i+1][j+1] != 0x80;
-                }
-                else if (i == 0 && j > 0 && j < D2-1) {
-                    table[i][j-1]   += table[i][j-1]   != 0x80;
-                    table[i][j+1]   += table[i][j+1]   != 0x80;
-                    table[i+1][j-1] += table[i+1][j-1] != 0x80;
-                    table[i+1][j]   += table[i+1][j]   != 0x80;
-                    table[i+1][j+1] += table[i+1][j+1] != 0x80;
-                }
-                else if (i == D1-1 && j > 0 && j < D2-1) {
-                    table[i-1][j-1] += table[i-1][j-1] != 0x80;
-                    table[i-1][j]   += table[i-1][j]   != 0x80;
-                    table[i-1][j+1] += table[i-1][j+1] != 0x80;
-                    table[i][j-1]   += table[i][j-1]   != 0x80;
-                    table[i][j+1]   += table[i][j+1]   != 0x80;
-                }
-                else if (j == 0 && i > 0 && i < D1-1) {
-                    table[i-1][j]   += table[i-1][j]   != 0x80;
-                    table[i-1][j+1] += table[i-1][j+1] != 0x80;
-                    table[i][j+1]   += table[i][j+1]   != 0x80;
-                    table[i+1][j]   += table[i+1][j]   != 0x80;
-                    table[i+1][j+1] += table[i+1][j+1] != 0x80;
-                }
-                else if (j == D2-1 && i > 0 && i < D1-1) {
-                    table[i-1][j-1] += table[i-1][j-1] != 0x80;
-                    table[i-1][j]   += table[i-1][j]   != 0x80;
-                    table[i][j-1]   += table[i][j-1]   != 0x80;
-                    table[i+1][j-1] += table[i+1][j-1] != 0x80;
-                    table[i+1][j]   += table[i+1][j]   != 0x80;
-                }
-                else if (table[0][0] == 0x80) {
-                    table[0][1] += table[0][1] != 0x80;
-                    table[1][1] += table[1][1] != 0x80;
-                    table[1][0] += table[1][0] != 0x80;
-                }
-                else if (table[0][D2-1] == 0x80) {
-                    table[0][D2-2] += table[0][D2-2] != 0x80;
-                    table[1][D2-2] += table[1][D2-2] != 0x80;
-                    table[1][D2-1] += table[1][D2-1] != 0x80;
-                }
-                else if (table[D1-1][0] == 0x80) {
-                    table[D1-2][0] += table[D1-2][0] != 0x80;
-                    table[D1-2][1] += table[D1-2][1] != 0x80;
-                    table[D1-1][1] += table[D1-1][1] != 0x80;
-                }
-                else if (table[D1-1][D2-1] == 0x80) {
-                    table[D1-2][D2-2] += table[D1-2][D2-2] != 0x80;
-                    table[D1-2][D2-2] += table[D1-2][D2-2] != 0x80;
-                    table[D1-1][D2-1] += table[D1-1][D2-1] != 0x80;
-                }
-                
-            }
+            if (table[i][j] != 0x80) continue;
+            
+            nBomb++;
+            table[i-1][j-1] += table[i-1][j-1] != 0x80;
+            table[i-1][j]   += table[i-1][j]   != 0x80;
+            table[i-1][j+1] += table[i-1][j+1] != 0x80;
+            table[i][j-1]   += table[i][j-1]   != 0x80;
+            table[i][j+1]   += table[i][j+1]   != 0x80;
+            table[i+1][j-1] += table[i+1][j-1] != 0x80;
+            table[i+1][j]   += table[i+1][j]   != 0x80;
+            table[i+1][j+1] += table[i+1][j+1] != 0x80;
             
         }
+    }
+
+    // Count number of bombs on the top and bottom borders
+    for (int i = 1; i < D2 - 1; i++) {
+        if (table[0][i] == 0x80) {
+            nBomb++;
+            table[0][i-1] += table[0][i-1] != 0x80;
+            table[0][i+1] += table[0][i+1] != 0x80;
+            table[1][i-1] += table[1][i-1] != 0x80;
+            table[1][i]   += table[1][i]   != 0x80;
+            table[1][i+1] += table[1][i+1] != 0x80;
+        }
+        if (table[D1-1][i] == 0x80) {
+            nBomb++;
+            table[D1-2][i-1] += table[D1-2][i-1] != 0x80;
+            table[D1-2][i]   += table[D1-2][i]   != 0x80;
+            table[D1-2][i+1] += table[D1-2][i+1] != 0x80;
+            table[D1-1][i-1] += table[D1-1][i-1] != 0x80;
+            table[D1-1][i+1] += table[D1-1][i+1] != 0x80;
+        }
+    }
+    // Count number of bombs on the left and right borders
+    for (int i = 1; i < D1 - 1; i++) {
+        if (table[i][0] == 0x80) {
+            nBomb++;
+            table[i-1][0] += table[i-1][0] != 0x80;
+            table[i-1][1] += table[i-1][1] != 0x80;
+            table[i][1]   += table[i][1]   != 0x80;
+            table[i+1][0] += table[i+1][0] != 0x80;
+            table[i+1][1] += table[i+1][1] != 0x80;
+        }
+        if (table[i][D2-1] == 0x80) {
+            nBomb++;
+            table[i-1][D2-1] += table[i-1][D2-1] != 0x80;
+            table[i-1][D2-2] += table[i-1][D2-2] != 0x80;
+            table[i][D2-2]   += table[i][D2-2]   != 0x80;
+            table[i+1][D2-1] += table[i+1][D2-1] != 0x80;
+            table[i+1][D2-2] += table[i+1][D2-2] != 0x80;
+        }
+    }
+
+    // Count number of bombs on the corners
+    if (table[0][0] == 0x80) {
+        nBomb++;
+        table[0][1] += table[0][1] != 0x80;
+        table[1][1] += table[1][1] != 0x80;
+        table[1][0] += table[1][0] != 0x80;
+    }
+    else if (table[0][D2-1] == 0x80) {
+        nBomb++;
+        table[0][D2-2] += table[0][D2-2] != 0x80;
+        table[1][D2-2] += table[1][D2-2] != 0x80;
+        table[1][D2-1] += table[1][D2-1] != 0x80;
+    }
+    else if (table[D1-1][0] == 0x80) {
+        nBomb++;
+        table[D1-2][0] += table[D1-2][0] != 0x80;
+        table[D1-2][1] += table[D1-2][1] != 0x80;
+        table[D1-1][1] += table[D1-1][1] != 0x80;
+    }
+    else if (table[D1-1][D2-1] == 0x80) {
+        nBomb++;
+        table[D1-2][D2-2] += table[D1-2][D2-2] != 0x80;
+        table[D1-2][D2-2] += table[D1-2][D2-2] != 0x80;
+        table[D1-1][D2-1] += table[D1-1][D2-1] != 0x80;
     }
 
 }
@@ -212,8 +228,6 @@ char choose_table_letter(BYTE value) {
 
 void print_table() {
 
-    // system("cls");
-
     printf("┌");
     for (BYTE i = 0; i < D2; i++) printf("───┬");
     printf("\b┐");
@@ -235,8 +249,10 @@ void print_table() {
     for (BYTE i = 0; i < D2; i++) printf("───┴");
     printf("\b┘\n");
 
-    printf("Number of Bombs: %d\n", nBomb);
-    printf("Number of Flags: %d\n", nFounedBomb);
+    if (playing) {
+        printf("Number of Bombs: %d\n", nBomb);
+        printf("Number of Flags: %d\n", nFounedBomb);
+    }
 
 }
 
@@ -317,7 +333,6 @@ void handle_click() {
     visited->prev = NULL;
 
     while (visited != NULL) {
-        printf("x = %d, y = %d, checked = %x\n", visited->x, visited->y, visited->checked);
         if (visited->y == D1-1) visited->checked = visited->checked | 0b1000;
         if (visited->x == 0) visited->checked = visited->checked | 0b0100;
         if (visited->y == 0) visited->checked = visited->checked | 0b0010;
