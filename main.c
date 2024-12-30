@@ -60,6 +60,8 @@ int main(int argc, char const *argv[]) {
         if (input.action == 0b00) continue;
         if (input.action == 0b10 && is_bomb()) {
             printf("Sorry, you lost the game\n");
+            playing = false;
+            print_table();
             break;
         }
 
@@ -155,7 +157,7 @@ void generate_table() {
 
 }
 
-char choose_table_letter(BYTE value) {
+char choose_user_table_letter(BYTE value) {
     switch (value) {
         case 0b01000000:
             return 'E';
@@ -181,6 +183,11 @@ char choose_table_letter(BYTE value) {
             return ' ';
     }
 }
+char choose_table_letter(BYTE value) {
+    value = choose_user_table_letter(value);
+    if (value == 'F') return 'B';
+    return value;
+}
 
 void print_table() {
 
@@ -192,7 +199,11 @@ void print_table() {
     for (BYTE i = 0; i < D1; i++) {
         printf("\n│");
         for (BYTE j = 0; j < D2; j++) {
-            printf(" %c │", choose_table_letter(userTable[i][j]));
+            if (playing) {
+                printf(" %c │", choose_table_letter(userTable[i][j]));
+            } else {
+                printf(" %c │", choose_table_letter(table[i][j]));
+            }
         }
         printf("\n├");
         for (BYTE j = 0; j < D2; j++) printf("───┼");
@@ -205,6 +216,7 @@ void print_table() {
 
     printf("Number of Bombs: %d\n", nBomb);
     printf("Number of Flags: %d\n", nFounedBomb);
+    
 
 }
 
@@ -245,7 +257,6 @@ void update_table() {
 }
 
 void free_table() {
-    // TODO: clear tables from memory
 
     for (BYTE i = 0; i < D1; i++) {
         free(table[i]);
