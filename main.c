@@ -7,7 +7,7 @@
 #include <locale.h>
 #include <ctype.h>
 
-#define BOMB_CHANCE .10
+#define BOMB_CHANCE .12
 #define UNVISITED 0x25A1
 
 typedef uint8_t BYTE;
@@ -28,7 +28,7 @@ struct {
 void generate_table();
 void print_table();
 void translate_action(char action, char *cell);
-bool is_bomb(BYTE x, BYTE y);
+bool is_bomb();
 void update_table();
 void free_table();
 
@@ -44,6 +44,7 @@ int main(int argc, char const *argv[]) {
 
     generate_table();
     while (playing) {
+
         print_table();
         char userAction[2];
         char cell[6];
@@ -57,8 +58,11 @@ int main(int argc, char const *argv[]) {
         translate_action(userAction[0], cell);
 
         if (input.action == 0b00) continue;
+        if (input.action == 0b10 && is_bomb()) {
+            printf("Sorry, you lost the game\n");
+            break;
+        }
 
-        break;
     }
     free_table();
 
@@ -205,7 +209,7 @@ void print_table() {
 }
 
 void translate_action(char action, char *cell) {
-    
+
     input.action = 0;
 
     for (BYTE i = 0; i < 6; i++) 
@@ -228,8 +232,12 @@ void translate_action(char action, char *cell) {
 
 }
 
-bool is_bomb(BYTE x, BYTE y) {
-    // TODO: check if user clicked on a bomb
+bool is_bomb() {
+    
+    if (userTable[input.y][input.x] == 0x80) return false;
+    if (table[input.y][input.x] == 0x80) return true;
+    return false;
+
 }
 
 void update_table() {
