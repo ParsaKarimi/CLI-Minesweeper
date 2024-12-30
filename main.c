@@ -205,8 +205,7 @@ void print_table() {
 }
 
 void translate_action(char action, char *cell) {
-    // TODO: convert text values into usable structure
-
+    
     input.action = 0;
 
     for (BYTE i = 0; i < 6; i++) 
