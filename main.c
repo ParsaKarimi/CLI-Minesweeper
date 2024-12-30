@@ -25,6 +25,11 @@ struct {
     BYTE action;
 } input;
 
+struct stack {
+    struct stack *prev;
+    BYTE x, y, checked;
+};
+
 void generate_table();
 void print_table();
 void translate_action(char action, char *cell);
@@ -53,6 +58,12 @@ int main(int argc, char const *argv[]) {
         
         scanf(" %1s", &userAction, 1);
         if (toupper(userAction[0]) == 'E') break;
+        if (toupper(userAction[0]) == 'T') {
+            playing = false;
+            print_table();
+            playing = true;
+            continue;
+        }
 
         scanf(" %2s", &cell[0], 2);
         scanf(" %2s", &cell[3], 2);
@@ -67,6 +78,7 @@ int main(int argc, char const *argv[]) {
             break;
         }
         if (input.action == 0b11) handle_flag();
+        handle_click();
 
     }
     free_table();
@@ -261,12 +273,100 @@ bool is_bomb() {
 
 }
 
+bool visit_cell(struct stack **visited, BYTE x, BYTE y) {
+    if (userTable[y][x] == 0b01000000) return false;
+
+    if (userTable[y][x] == 0x80) {
+        nFounedBomb--;
+    }
+    userTable[y][x] = table[y][x];
+
+    if (table[y][x] == 0) {
+        userTable[y][x] = 0b01000000;
+        struct stack *new = malloc(sizeof(struct stack));
+        new->x = x;
+        new->y = y;
+        new->prev = *visited;
+        new->checked = 0;
+        *visited = new;
+        return true;
+    }
+    
+    return false;
+}
+
 void handle_click() {
-    // TODO: expand area if needed or just show the number
+    
+    if (userTable[input.y][input.x] != 0) return;
+    if (table[input.y][input.x] != 0) {
+        userTable[input.y][input.x] = table[input.y][input.x];
+        return;
+    }
+
+    userTable[input.y][input.x] = 0b01000000;
+    
+    struct stack *visited = malloc(sizeof(struct stack));
+    visited->x = input.x;
+    visited->y = input.y;
+    visited->checked = 0;
+    visited->prev = NULL;
+
+    while (visited != NULL) {
+        printf("x = %d, y = %d, checked = %x\n", visited->x, visited->y, visited->checked);
+        if (visited->y == D1-1) visited->checked = visited->checked | 0b1000;
+        if (visited->x == 0) visited->checked = visited->checked | 0b0100;
+        if (visited->y == 0) visited->checked = visited->checked | 0b0010;
+        if (visited->x == D2-1) visited->checked = visited->checked | 0b0001;
+
+        if (!(visited->checked & 0b1000)) {
+            
+            visited->checked = visited->checked | 0b1000;
+            if (visit_cell(&visited, visited->x, visited->y+1)) {
+                visited->checked = 0b0010;
+                continue;
+            }
+            
+        }
+        if (!(visited->checked & 0b0100)) {
+
+            visited->checked = visited->checked | 0b0100;
+            if (visit_cell(&visited, visited->x-1, visited->y)) {
+                visited->checked = 0b0001;
+                continue;
+            }
+            
+        }
+        if (!(visited->checked & 0b0010)) {
+
+            visited->checked = visited->checked | 0b0010;
+            if (visit_cell(&visited, visited->x, visited->y-1)) {
+                visited->checked = 0b1000;
+                continue;
+            }
+            
+        }
+        if (!(visited->checked & 0b0001)) {
+
+            visited->checked = visited->checked | 0b0001;
+            if (visit_cell(&visited, visited->x+1, visited->y)) {
+                visited->checked = 0b0100;
+                continue;
+            }
+            
+        }
+
+        struct stack *temp = visited;
+        visited = visited->prev;
+        free(temp);
+        
+    }
+    
+    
 }
 
 void handle_flag() {
     
+    if(userTable[input.y][input.x] != 0x80 || userTable[input.y][input.x] != 0) return;
     userTable[input.y][input.x] = userTable[input.y][input.x] == 0x80 ? 0:0x80;
     nFounedBomb += userTable[input.y][input.x] == 0x80 ? 1:-1;
 
