@@ -231,7 +231,6 @@ void print_table() {
 
     printf("Number of Bombs: %d\n", nBomb);
     printf("Number of Flags: %d\n", nFounedBomb);
-    
 
 }
 
@@ -360,7 +359,6 @@ void handle_click() {
         free(temp);
         
     }
-    
     
 }
 
