@@ -7,7 +7,7 @@
 #include <locale.h>
 #include <ctype.h>
 
-#define BOMB_CHANCE .10
+#define BOMB_CHANCE .12
 #define UNVISITED 0x25A1
 
 typedef uint8_t BYTE;
@@ -28,7 +28,7 @@ struct {
 void generate_table();
 void print_table();
 void translate_action(char action, char *cell);
-bool is_bomb(BYTE x, BYTE y);
+bool is_bomb();
 void handle_click();
 void handle_flag();
 void update_table();
@@ -46,6 +46,7 @@ int main(int argc, char const *argv[]) {
 
     generate_table();
     while (playing) {
+
         print_table();
         char userAction[2];
         char cell[6];
@@ -59,8 +60,13 @@ int main(int argc, char const *argv[]) {
         translate_action(userAction[0], cell);
 
         if (input.action == 0b00) continue;
+        if (input.action == 0b10 && is_bomb()) {
+            printf("Sorry, you lost the game\n");
+            playing = false;
+            print_table();
+            break;
+        }
 
-        break;
     }
     free_table();
 
@@ -153,7 +159,7 @@ void generate_table() {
 
 }
 
-char choose_table_letter(BYTE value) {
+char choose_user_table_letter(BYTE value) {
     switch (value) {
         case 0b01000000:
             return 'E';
@@ -179,6 +185,11 @@ char choose_table_letter(BYTE value) {
             return ' ';
     }
 }
+char choose_table_letter(BYTE value) {
+    value = choose_user_table_letter(value);
+    if (value == 'F') return 'B';
+    return value;
+}
 
 void print_table() {
 
@@ -190,7 +201,11 @@ void print_table() {
     for (BYTE i = 0; i < D1; i++) {
         printf("\n│");
         for (BYTE j = 0; j < D2; j++) {
-            printf(" %c │", choose_table_letter(userTable[i][j]));
+            if (playing) {
+                printf(" %c │", choose_table_letter(userTable[i][j]));
+            } else {
+                printf(" %c │", choose_table_letter(table[i][j]));
+            }
         }
         printf("\n├");
         for (BYTE j = 0; j < D2; j++) printf("───┼");
@@ -203,11 +218,12 @@ void print_table() {
 
     printf("Number of Bombs: %d\n", nBomb);
     printf("Number of Flags: %d\n", nFounedBomb);
+    
 
 }
 
 void translate_action(char action, char *cell) {
-    
+
     input.action = 0;
 
     for (BYTE i = 0; i < 6; i++) 
@@ -230,8 +246,12 @@ void translate_action(char action, char *cell) {
 
 }
 
-bool is_bomb(BYTE x, BYTE y) {
-    // TODO: check if user clicked on a bomb
+bool is_bomb() {
+    
+    if (userTable[input.y][input.x] == 0x80) return false;
+    if (table[input.y][input.x] == 0x80) return true;
+    return false;
+
 }
 
 void handle_click() {
@@ -247,7 +267,6 @@ void update_table() {
 }
 
 void free_table() {
-    // TODO: clear tables from memory
 
     for (BYTE i = 0; i < D1; i++) {
         free(table[i]);
