@@ -16,6 +16,7 @@ BYTE **table;
 BYTE **userTable;
 int nBomb;
 int nFounedBomb;
+bool playing = true;
 
 struct input {
     BYTE x;
@@ -34,6 +35,8 @@ int main(int argc, char const *argv[]) {
     srand(time(NULL));
     setlocale(LC_CTYPE, "");
 
+    printf("press enter to start!");
+
     D1 = atoi(argv[1]);
     D2 = atoi(argv[2]);
     if (D1 < 10 || D2 < 10) {
@@ -41,7 +44,15 @@ int main(int argc, char const *argv[]) {
     }
 
     generate_table();
-    print_table();
+    while (playing) {
+        print_table();
+        char userAction;
+        char cell[4];
+        scanf_s(" %1c", &userAction, 1);
+        scanf_s(" %2c", &cell[0], 2);
+        scanf_s(" %2c", &cell[2], 2);
+        break;
+    }
     free_table();
 
     return 0;
