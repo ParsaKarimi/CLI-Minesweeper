@@ -29,6 +29,8 @@ void generate_table();
 void print_table();
 void translate_action(char action, char *cell);
 bool is_bomb(BYTE x, BYTE y);
+void handle_click();
+void handle_flag();
 void update_table();
 void free_table();
 
@@ -230,6 +232,14 @@ void translate_action(char action, char *cell) {
 
 bool is_bomb(BYTE x, BYTE y) {
     // TODO: check if user clicked on a bomb
+}
+
+void handle_click() {
+    // TODO: expand area if needed or just show the number
+}
+
+void handle_flag() {
+    // TODO: add or remove flag from a cell
 }
 
 void update_table() {
