@@ -31,6 +31,7 @@ void translate_action(char action, char *cell);
 bool is_bomb();
 void handle_click();
 void handle_flag();
+bool is_game_finished();
 void free_table();
 
 int main(int argc, char const *argv[]) {
@@ -269,6 +270,10 @@ void handle_flag() {
     userTable[input.y][input.x] = userTable[input.y][input.x] == 0x80 ? 0:0x80;
     nFounedBomb += userTable[input.y][input.x] == 0x80 ? 1:-1;
 
+}
+
+bool is_game_finished() {
+    // TODO: check if all bombs are founded
 }
 
 void free_table() {
