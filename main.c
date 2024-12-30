@@ -232,6 +232,12 @@ void translate_action(char action, char *cell) {
     input.x = strtol(&cell[0], NULL, 16);
     input.y = strtol(&cell[3], NULL, 16);
 
+    if (input.x >= D2 || input.y >= D1) {
+        input.action = 0;
+        return;
+    }
+    
+
     switch (toupper(action)) {
         case 'C':
             input.action = 0b10;
