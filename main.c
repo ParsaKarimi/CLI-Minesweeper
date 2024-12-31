@@ -40,7 +40,7 @@ void free_table();
 
 int main(int argc, char const *argv[]) {
     srand(time(NULL));
-    setlocale(LC_CTYPE, "");
+    setlocale(LC_CTYPE, ".UTF8");
 
     D1 = atoi(argv[2]);
     D2 = atoi(argv[1]);
