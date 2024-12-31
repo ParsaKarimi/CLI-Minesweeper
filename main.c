@@ -227,11 +227,17 @@ char choose_table_letter(BYTE value) {
 
 void print_table() {
 
-    printf("┌");
+    // printing column number
+    printf("      ");
+    for (BYTE i = 0; i < D2; i++) printf("%x   ", i / 16);
+    printf("\n      ");
+    for (BYTE i = 0; i < D2; i++) printf("%x   ", i % 16);
+
+    printf("\n    ┌");
     for (BYTE i = 0; i < D2; i++) printf("───┬");
     printf("\b┐");
     for (BYTE i = 0; i < D1; i++) {
-        printf("\n│");
+        printf("\n %02x │", i);
         for (BYTE j = 0; j < D2; j++) {
             if (playing) {
                 printf(" %c │", choose_user_table_letter(userTable[i][j]));
@@ -239,18 +245,18 @@ void print_table() {
                 printf(" %c │", choose_table_letter(table[i][j]));
             }
         }
-        printf("\n├");
+        printf("\n    ├");
         for (BYTE j = 0; j < D2; j++) printf("───┼");
         printf("\b┤");
     }
     for (BYTE i = 0; i < D2; i++) printf("\b\b\b\b\b");
-    printf("└");
+    printf("    └");
     for (BYTE i = 0; i < D2; i++) printf("───┴");
     printf("\b┘\n");
 
     if (playing) {
-        printf("Number of Bombs: %d\n", nBomb);
-        printf("Number of Flags: %d\n", nFounedBomb);
+        printf("    Number of Bombs: %d", nBomb);
+        printf("\t\tNumber of Flags: %d\n", nFounedBomb);
     }
 
 }
