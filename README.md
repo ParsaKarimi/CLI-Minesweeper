@@ -19,7 +19,7 @@ A command-line implementation of the classic Minesweeper game written in C. This
 2. **Run the Game**:
    Execute the compiled program:
    ```bash
-   ./minesweeper
+   ./minesweeper <columns> <rows>
    ```
 
 3. **Input Format**:
