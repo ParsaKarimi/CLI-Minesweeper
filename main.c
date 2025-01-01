@@ -73,7 +73,7 @@ int main(int argc, char const *argv[]) {
 
         if (input.action == 0b00) continue;
         if (input.action == 0b10 && is_bomb()) {
-            printf("Sorry, you lost the game\n");
+            printf("Sorry, you lost the game!\n");
             playing = false;
             print_table();
             break;
@@ -193,36 +193,35 @@ void generate_table() {
 
 }
 
-char choose_user_table_letter(BYTE value) {
+char *choose_user_table_letter(BYTE value) {
     switch (value) {
         case 0b01000000:
-            return 'E';
+            return "E";
         case 1:
-            return '1';
+            return "\033[0;34m1\033[0;37m";
         case 2:
-            return '2';
+            return "\033[0;32m2\033[0;37m";
         case 3:
-            return '3';
+            return "\033[0;31m3\033[0;37m";
         case 4:
-            return '4';
+            return "\033[0;35m4\033[0;37m";
         case 5:
-            return '5';
+            return "\033[0;35m5\033[0;37m";
         case 6:
-            return '6';
+            return "\033[0;34m6\033[0;37m";
         case 7:
-            return '7';
+            return "\033[0;32m7\033[0;37m";
         case 8:
-            return '8';
+            return "\033[0;31m8\033[0;37m";
         case 0x80:
-            return 'F';
+            return "\033[0;36mF\033[0;37m";
         default:
-            return ' ';
+            return " ";
     }
 }
-char choose_table_letter(BYTE value) {
-    value = choose_user_table_letter(value);
-    if (value == 'F') return 'B';
-    return value;
+char *choose_table_letter(BYTE value) {
+    if (value == 0x80) return "\033[0;36mB\033[0;37m";
+    return choose_user_table_letter(value);
 }
 
 void print_table() {
@@ -240,9 +239,9 @@ void print_table() {
         printf("\n %02x │", i);
         for (BYTE j = 0; j < D2; j++) {
             if (playing) {
-                printf(" %c │", choose_user_table_letter(userTable[i][j]));
+                printf(" %s │", choose_user_table_letter(userTable[i][j]));
             } else {
-                printf(" %c │", choose_table_letter(table[i][j]));
+                printf(" %s │", choose_table_letter(table[i][j]));
             }
         }
         printf("\n    ├");
